@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from genericpath import isdir
 import os
+import uuid
 from shutil import copyfile, rmtree
 from typing import Text
 from PIL import Image
@@ -9,8 +10,8 @@ import zipfile
 #需要 pip3 install Pillow
 
 #################-----Config-----###############
-BOOK_TITLE = "死神1-5"
-BOOK_ID = "3WMTMZLG-COKT-YK48-S57I-BOFZHLV7VLB1" #瞎填一个吧，懒得写随机函数了
+BOOK_TITLE = "死神"   #书名
+MAX_CHAPTER = 5       #文件夹数量超过这个 会生成多个epub文件
 #################-----Config-----###############
 
 
@@ -32,6 +33,7 @@ def readFile(path):
     fp.close()
     return str
 
+
 def walk(folder, rootData, chaperData):
     fs = os.listdir(folder)
     for fl in fs:
@@ -52,8 +54,8 @@ def walk(folder, rootData, chaperData):
             walk(tmp_path, rootData, newChapter["files"])
 
 textTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "text", "p_temp.xhtml"))
-def genOEBPSTextFile(chapterID, subID, imageName, data):
-    newTextStr = textTempStr.replace("###BOOK_TITLE###", BOOK_TITLE, 1)
+def genOEBPSTextFile(chapterID, subID, imageName, bookTitle, data):
+    newTextStr = textTempStr.replace("###BOOK_TITLE###", bookTitle, 1)
     newTextStr = newTextStr.replace("###IMAGE_FILE###", imageName, 1)
     fileName = "p%03d_%05d"%(chapterID,subID)
     writeFile(os.path.join(TextFolder, fileName+".xhtml"), newTextStr)
@@ -114,23 +116,22 @@ rootFiles = []
 walk(SrcPath, SrcData, rootFiles)
 
 
-
-# 处理图片、并统计数据
-print("----------开始处理原始图片，并迁移到临时目录-----------")
-
-def genBook(srcData, outFilename):
+def genBook(srcData, bookTitle, outFilename):
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
     reGenTempFolder()
 
+    print("生成电子书："+bookTitle)
     chapterID = 0
     for data in srcData:
-        print("处理章节："+data["name"])
+        print("生成章节："+data["name"])
         chapterID = chapterID + 1
         data["chapterID"] = chapterID
         subID = 1
+        subLens = len(data["files"])
 
         for file in data["files"]:
+            print("\r%d/%d"%(subID, subLens), end="", flush=True)
             img0 = Image.open(file)
             w, h = img0.size
             if SpliteImage and w > h: #宽>高 需要切隔为两张图片
@@ -144,18 +145,19 @@ def genBook(srcData, outFilename):
 
                 name1 = "i%03d_%05d.png"%(chapterID,subID)
                 newImg1.save(os.path.join(ImgFolder, name1), "png")
-                genOEBPSTextFile(chapterID,subID,name1,data)
+                genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
                 subID = subID + 1
                 name2 = "i%03d_%05d.png"%(chapterID,subID)
                 newImg2.save(os.path.join(ImgFolder, name2 ), "png")
-                genOEBPSTextFile(chapterID,subID,name2,data)
+                genOEBPSTextFile(chapterID,subID,name2,bookTitle,data)
                 subID = subID + 1
 
+                subLens = subLens + 1
             else:
                 pFormat = file[-4:]
                 name = "i%03d_%05d%s"%(chapterID,subID,pFormat)
                 copyfile(file, os.path.join(ImgFolder, name))
-                genOEBPSTextFile(chapterID,subID,name,data)
+                genOEBPSTextFile(chapterID,subID,name,bookTitle,data)
                 subID = subID + 1
 
     #封面图片处理
@@ -212,8 +214,8 @@ def genBook(srcData, outFilename):
             isInLeft = not isInLeft
 
     opfTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "standard.opf"))
-    newOpfStr = opfTempStr.replace("###BOOK_TITLE###", BOOK_TITLE)
-    newOpfStr = newOpfStr.replace("###BOOK_ID###", BOOK_ID)
+    newOpfStr = opfTempStr.replace("###BOOK_TITLE###", bookTitle)
+    newOpfStr = newOpfStr.replace("###BOOK_ID###", uuid.uuid1())
     newOpfStr = newOpfStr.replace("###BOOK_ITEMS###", itemsStr)
     newOpfStr = newOpfStr.replace("###BOOK_ITEMREFS###", itemRefStr)
 
@@ -230,5 +232,17 @@ def genBook(srcData, outFilename):
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
 
+if (len(SrcData) > MAX_CHAPTER):
+    total = len(SrcData)
+    st = 0
+    ed = 5
 
-genBook(SrcData, "Book.epub")
+    while st < total:
+        subData = SrcData[st:ed]
+        title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
+        genBook(subData, title, title+".epub")
+
+        st = ed
+        ed = min(st + MAX_CHAPTER, total)
+else:
+    genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub")
