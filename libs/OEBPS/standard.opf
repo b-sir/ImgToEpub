@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package
+  xmlns="http://www.idpf.org/2007/opf"
+  version="3.0"
+  xml:lang="ja"
+  unique-identifier="unique-id"
+  prefix="rendition: http://www.idpf.org/vocab/rendition/#
+          epub-bundle-tool: https://wing-kai.github.io/epub-manga-creator/
+          ebpaj: http://www.ebpaj.jp/
+          fixed-layout-jp: http://www.digital-comic.jp/
+          ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/"
+>
+
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<!-- 作品名 -->
+<dc:title id="title">###BOOK_TITLE###</dc:title>
+<meta refines="#title" property="file-as"></meta>
+
+<!-- 著者名 -->
+<dc:creator id="creator1"></dc:creator>
+<meta refines="#creator1" property="role" scheme="marc:relators">aut</meta>
+<meta refines="#creator1" property="file-as"></meta>
+<meta refines="#creator1" property="display-seq">1</meta>
+
+<dc:subject></dc:subject>
+
+<!-- 出版社名 -->
+<dc:publisher id="publisher"></dc:publisher>
+<meta refines="#publisher" property="file-as"></meta>
+
+<!-- 言語 -->
+<dc:language>ja</dc:language>
+
+<!-- ファイルid -->
+<dc:identifier id="unique-id">urn:uuid:###BOOK_ID###</dc:identifier>
+
+<!-- 更新日 -->
+<meta property="dcterms:modified">2022-10-22T04:49:58.408Z</meta>
+
+<!-- Fixed-Layout Documents指定 -->
+<meta property="rendition:layout">pre-paginated</meta>
+<meta property="rendition:spread">none</meta>
+
+<!-- etc. -->
+<meta property="ibooks:specified-fonts">true</meta>
+<meta property="ibooks:binding">false</meta>
+<meta property="ebpaj:guide-version">1.1</meta>
+<meta name="cover" content="cover"></meta>
+<meta name="original-resolution" content="1050x1485"/>
+<meta name="orientation-lock" content="none"/>
+
+<meta property="fixed-layout-jp:viewport">width=1050, height=1485</meta>
+
+</metadata>
+
+<manifest>
+
+<!-- navigation -->
+<item media-type="application/xhtml+xml" id="toc" href="navigation-documents.xhtml" properties="nav"></item>
+
+<!-- style -->
+<item media-type="text/css" id="fixed-layout-jp" href="style/fixed-layout-jp.css"></item>
+
+<!-- image -->
+<!-- <item id="cover" href="image/cover.jpg" media-type="image/jpeg" properties="cover-image"></item> -->
+<!-- <item id="i_0000" href="image/i_0000.png" media-type="image/png"></item> -->
+
+<!-- text -->
+<!-- <item id="p_cover" href="text/p_cover.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="cover"></item> -->
+<!-- <item id="p_0000" href="text/p_0000.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="i_0000"></item> -->
+
+###BOOK_ITEMS###
+
+</manifest>
+
+<spine page-progression-direction="rtl">
+
+<itemref linear="yes" idref="p_cover" properties="rendition:page-spread-center"></itemref>
+<!-- <itemref linear="yes" idref="p_0000" properties="page-spread-right"></itemref> -->
+<!-- <itemref linear="yes" idref="p_0001" properties="page-spread-left"></itemref> -->
+
+###BOOK_ITEMREFS###
+
+</spine>
+
+</package>
