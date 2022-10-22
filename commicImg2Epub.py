@@ -215,7 +215,7 @@ def genBook(srcData, bookTitle, outFilename):
 
     opfTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "standard.opf"))
     newOpfStr = opfTempStr.replace("###BOOK_TITLE###", bookTitle)
-    newOpfStr = newOpfStr.replace("###BOOK_ID###", uuid.uuid1())
+    newOpfStr = newOpfStr.replace("###BOOK_ID###", str(uuid.uuid1()))
     newOpfStr = newOpfStr.replace("###BOOK_ITEMS###", itemsStr)
     newOpfStr = newOpfStr.replace("###BOOK_ITEMREFS###", itemRefStr)
 
