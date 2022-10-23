@@ -240,7 +240,7 @@ def genBook(srcData, bookTitle, outFilename):
     writeFile(os.path.join(TmpPath, "OEBPS", "navigation-documents.xhtml"), newDocStr)
 
 
-    print("\n压制中...")
+    print("\n压制中... => "+outFilename)
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
 
