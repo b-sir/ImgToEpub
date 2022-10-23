@@ -1,6 +1,7 @@
 #!/usr/bin/python3
+from functools import cache
 from genericpath import isdir
-import os
+import os,sys
 import uuid
 from shutil import copyfile, rmtree
 from typing import Text
@@ -117,11 +118,15 @@ walk(SrcPath, SrcData, rootFiles)
 
 
 def genBook(srcData, bookTitle, outFilename):
+    if os.path.exists(os.path.join(TgtPath, outFilename)):
+        print("跳过：已存在电子书 "+outFilename)
+        return
+
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
     reGenTempFolder()
 
-    print("生成电子书："+bookTitle)
+    print("开始生成电子书："+bookTitle)
     chapterID = 0
     for data in srcData:
         print("生成章节："+data["name"])
@@ -132,33 +137,38 @@ def genBook(srcData, bookTitle, outFilename):
 
         for file in data["files"]:
             print("\r%d/%d"%(subID, subLens), end="", flush=True)
-            img0 = Image.open(file)
-            w, h = img0.size
-            if SpliteImage and w > h: #宽>高 需要切隔为两张图片
-                box1 = (w-w//2, 0, w, h)
-                box2 = (0, 0, w//2, h)
-                if not ReadModeRight:
-                    box1 = (0, 0, w//2, h)
-                    box2 = (w-w//2, 0, w, h)
-                newImg1 = img0.crop(box1).convert("RGB")
-                newImg2 = img0.crop(box2).convert("RGB")
+            try:
+                img0 = Image.open(file)
+                w, h = img0.size
+                if SpliteImage and w > h: #宽>高 需要切隔为两张图片
+                    box1 = (w-w//2, 0, w, h)
+                    box2 = (0, 0, w//2, h)
+                    if not ReadModeRight:
+                        box1 = (0, 0, w//2, h)
+                        box2 = (w-w//2, 0, w, h)
+                    newImg1 = img0.crop(box1).convert("RGB")
+                    newImg2 = img0.crop(box2).convert("RGB")
 
-                name1 = "i%03d_%05d.jpg"%(chapterID,subID)
-                newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=90)
-                genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
-                subID = subID + 1
-                name2 = "i%03d_%05d.jpg"%(chapterID,subID)
-                newImg2.save(os.path.join(ImgFolder, name2 ), "jpeg", quality=90)
-                genOEBPSTextFile(chapterID,subID,name2,bookTitle,data)
-                subID = subID + 1
+                    name1 = "i%03d_%05d.jpg"%(chapterID,subID)
+                    newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=90)
+                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
+                    subID = subID + 1
+                    name2 = "i%03d_%05d.jpg"%(chapterID,subID)
+                    newImg2.save(os.path.join(ImgFolder, name2 ), "jpeg", quality=90)
+                    genOEBPSTextFile(chapterID,subID,name2,bookTitle,data)
+                    subID = subID + 1
 
-                subLens = subLens + 1
-            else:
-                pFormat = file[-4:]
-                name = "i%03d_%05d%s"%(chapterID,subID,pFormat)
-                copyfile(file, os.path.join(ImgFolder, name))
-                genOEBPSTextFile(chapterID,subID,name,bookTitle,data)
-                subID = subID + 1
+                    subLens = subLens + 1
+                else:
+                    pFormat = file[-4:]
+                    name = "i%03d_%05d%s"%(chapterID,subID,pFormat)
+                    copyfile(file, os.path.join(ImgFolder, name))
+                    genOEBPSTextFile(chapterID,subID,name,bookTitle,data)
+                    subID = subID + 1
+            except KeyboardInterrupt: #手动Ctrl+C退出
+                sys.exit()
+            except:
+                print("\n\n文件异常 无法处理 跳过："+file+"\n\n")
 
     #封面图片处理
     coverSrcFile = ""
@@ -229,6 +239,7 @@ def genBook(srcData, bookTitle, outFilename):
     writeFile(os.path.join(TmpPath, "OEBPS", "navigation-documents.xhtml"), newDocStr)
 
 
+    print("\n压制中...")
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
 
