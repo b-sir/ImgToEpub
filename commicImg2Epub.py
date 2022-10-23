@@ -140,15 +140,15 @@ def genBook(srcData, bookTitle, outFilename):
                 if not ReadModeRight:
                     box1 = (0, 0, w//2, h)
                     box2 = (w-w//2, 0, w, h)
-                newImg1 = img0.crop(box1)
-                newImg2 = img0.crop(box2)
+                newImg1 = img0.crop(box1).convert("RGB")
+                newImg2 = img0.crop(box2).convert("RGB")
 
-                name1 = "i%03d_%05d.png"%(chapterID,subID)
-                newImg1.save(os.path.join(ImgFolder, name1), "png")
+                name1 = "i%03d_%05d.jpg"%(chapterID,subID)
+                newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=90)
                 genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
                 subID = subID + 1
-                name2 = "i%03d_%05d.png"%(chapterID,subID)
-                newImg2.save(os.path.join(ImgFolder, name2 ), "png")
+                name2 = "i%03d_%05d.jpg"%(chapterID,subID)
+                newImg2.save(os.path.join(ImgFolder, name2 ), "jpeg", quality=90)
                 genOEBPSTextFile(chapterID,subID,name2,bookTitle,data)
                 subID = subID + 1
 
