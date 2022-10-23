@@ -84,6 +84,9 @@ TextFolder = os.path.join(TmpPath, "OEBPS", "text")
 ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
 def reGenTempFolder():
+    if not os.path.exists(TgtPath):
+        os.mkdir(TgtPath)
+
     #临时目录
     if not os.path.exists(TmpPath):
         os.mkdir(TmpPath)
@@ -114,8 +117,6 @@ def reGenTempFolder():
 
 SrcData = []
 rootFiles = []
-walk(SrcPath, SrcData, rootFiles)
-
 
 def genBook(srcData, bookTitle, outFilename):
     if os.path.exists(os.path.join(TgtPath, outFilename)):
@@ -136,7 +137,7 @@ def genBook(srcData, bookTitle, outFilename):
         subLens = len(data["files"])
 
         for file in data["files"]:
-            print("\r%d/%d"%(subID, subLens), end="", flush=True)
+            print("\r[%d/%d]  %s"%(subID, subLens, os.path.basename(file)), end="", flush=True)
             try:
                 img0 = Image.open(file)
                 w, h = img0.size
@@ -242,6 +243,19 @@ def genBook(srcData, bookTitle, outFilename):
     print("\n压制中...")
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
+
+
+print("请输入图片所在最上层目录 路径，如：")
+print(SrcPath)
+SrcPath = input("请输入(或拖入)路径:")
+
+if not os.path.exists(SrcPath):
+    print("路径错误！")
+    sys.exit()
+
+BOOK_TITLE = os.path.basename(SrcPath)
+
+walk(SrcPath, SrcData, rootFiles)
 
 if (len(SrcData) > MAX_CHAPTER):
     total = len(SrcData)
