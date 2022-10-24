@@ -238,17 +238,6 @@ def genBook(srcData, bookTitle, outFilename):
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
 
-
-print("请输入图片所在最上层目录 路径，如：")
-print(SrcPath)
-SrcPath = input("请输入(或拖入)路径:")
-
-if not os.path.exists(SrcPath):
-    print("路径错误！")
-    sys.exit()
-
-BOOK_TITLE = os.path.basename(SrcPath)
-
 def walkAndGenBaseData(SrcPath):
     # 1.遍历目录，收集所有信息
     SrcData = []
@@ -268,7 +257,27 @@ def walkAndGenBaseData(SrcPath):
 
     return SrcData
 
+def PrintSrcData(srcData):
+    print("\n----------------- 结构预览 --------------------")
+    for iData in srcData:
+        print("----- %s -----"%iData["name"])
+        for fileName in iData["files"]:
+            print(fileName)
+
+print("请输入图片所在最上层目录 路径，如：")
+print(SrcPath)
+SrcPath = input("请输入(或拖入)路径:")
+
+if not os.path.exists(SrcPath):
+    print("路径错误！")
+    sys.exit()
+
+BOOK_TITLE = os.path.basename(SrcPath)
 SrcData = walkAndGenBaseData(SrcPath)
+
+PrintSrcData(SrcData)
+print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
+pause = input("确认正确后，输入任意内容继续：")
 
 if (len(SrcData) > MAX_CHAPTER):
     total = len(SrcData)
