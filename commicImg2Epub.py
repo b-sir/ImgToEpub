@@ -13,6 +13,8 @@ import zipfile
 #################-----Config-----###############
 JPEG_QUILTY = 90      #图片压缩质量 1~100
 MAX_CHAPTER = 5       #文件夹数量超过这个 会生成多个epub文件
+SpliteImage = True    #切割宽比高大的图片为两张图片
+ReadModeRight = True  #设置切割图片的阅读顺序 True为日漫右向左读
 #################-----Config-----###############
 
 BOOK_TITLE = "书名"   #
@@ -25,8 +27,6 @@ TmpPath = os.path.join(TgtPath, "Temp")
 TextFolder = os.path.join(TmpPath, "OEBPS", "text")
 ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
-SpliteImage = True #切割宽比高大的图片为两张图片
-ReadModeRight = True #设置切割图片的阅读顺序 True为日漫右向左读
 
 def writeFile(path, str):
     fp = open(path, 'w', encoding='UTF-8')
