@@ -115,9 +115,6 @@ def reGenTempFolder():
         os.mkdir(TgtPath)
 
 
-SrcData = []
-rootFiles = []
-
 def genBook(srcData, bookTitle, outFilename):
     if os.path.exists(os.path.join(TgtPath, outFilename)):
         print("跳过：已存在电子书 "+outFilename)
@@ -137,7 +134,8 @@ def genBook(srcData, bookTitle, outFilename):
         subLens = len(data["files"])
 
         for file in data["files"]:
-            print("\r[%d/%d]  %s"%(subID, subLens, os.path.basename(file)), end="", flush=True)
+            #print("\r[%d/%d]  %s"%(subID, subLens, os.path.basename(file)), end="", flush=True)
+            print("[%4d/%4d]  %s"%(subID, subLens, os.path.basename(file)) )
             try:
                 img0 = Image.open(file)
                 w, h = img0.size
@@ -172,11 +170,7 @@ def genBook(srcData, bookTitle, outFilename):
                 print("\n\n文件异常 无法处理 跳过："+file+"\n\n")
 
     #封面图片处理
-    coverSrcFile = ""
-    if len(rootFiles) > 0:
-        coverSrcFile = rootFiles[0]
-    else:
-        coverSrcFile = os.path.join(ImgFolder, srcData[0]["newImagefiles"][0])
+    coverSrcFile = os.path.join(ImgFolder, srcData[0]["newImagefiles"][0])
     coverFormat = coverSrcFile[-4:]
     coverFileName = "cover"+coverFormat 
     copyfile(coverSrcFile, os.path.join(ImgFolder, coverFileName))
@@ -255,7 +249,26 @@ if not os.path.exists(SrcPath):
 
 BOOK_TITLE = os.path.basename(SrcPath)
 
-walk(SrcPath, SrcData, rootFiles)
+def walkAndGenBaseData(SrcPath):
+    # 1.遍历目录，收集所有信息
+    SrcData = []
+    rootChapter = {}
+    rootChapter["name"] = os.path.basename(SrcPath)
+    rootChapter["files"] = []
+    rootChapter["newTextfiles"] = []
+    rootChapter["newImagefiles"] = []
+    SrcData.append(rootChapter)
+    walk(SrcPath, SrcData, rootChapter["files"])
+
+    # 过滤空章节：通常是父文件夹或空文件夹
+    newSrcData = []
+    for iData in SrcData:
+        if len(iData["files"]) > 0:
+            newSrcData.append(iData)
+
+    return SrcData
+
+SrcData = walkAndGenBaseData(SrcPath)
 
 if (len(SrcData) > MAX_CHAPTER):
     total = len(SrcData)
