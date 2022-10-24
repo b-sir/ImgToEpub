@@ -11,10 +11,11 @@ import zipfile
 #需要 pip3 install Pillow
 
 #################-----Config-----###############
-BOOK_TITLE = "死神"   #书名
+JPEG_QUILTY = 90      #图片压缩质量 1~100
 MAX_CHAPTER = 5       #文件夹数量超过这个 会生成多个epub文件
 #################-----Config-----###############
 
+BOOK_TITLE = "书名"   #
 
 CurrentDir = os.path.abspath(os.path.dirname(__file__))
 SrcPath = os.path.join(CurrentDir, "Resources")
@@ -149,7 +150,7 @@ def genBook(srcData, bookTitle, outFilename):
                     newImg2 = img0.crop(box2).convert("RGB")
 
                     name1 = "i%03d_%05d.jpg"%(chapterID,subID)
-                    newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=90)
+                    newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
                     genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
                     subID = subID + 1
                     name2 = "i%03d_%05d.jpg"%(chapterID,subID)
