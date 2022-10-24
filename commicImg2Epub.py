@@ -20,6 +20,10 @@ CurrentDir = os.path.abspath(os.path.dirname(__file__))
 SrcPath = os.path.join(CurrentDir, "Resources")
 TgtPath = os.path.join(CurrentDir, "Output")
 
+TmpPath = os.path.join(TgtPath, "Temp")
+TextFolder = os.path.join(TmpPath, "OEBPS", "text")
+ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
+
 SpliteImage = True #切割宽比高大的图片为两张图片
 ReadModeRight = True #设置切割图片的阅读顺序 True为日漫右向左读
 
@@ -78,10 +82,6 @@ def zipToFile(zipFile, folder, root):
          tmp_path = os.path.join(folder, fl)
          if os.path.isdir(tmp_path):
             zipToFile(zipFile, tmp_path, root)
-
-TmpPath = os.path.join(TgtPath, "Temp")
-TextFolder = os.path.join(TmpPath, "OEBPS", "text")
-ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
 def reGenTempFolder():
     if not os.path.exists(TgtPath):
@@ -238,6 +238,9 @@ def genBook(srcData, bookTitle, outFilename):
     bookFile = zipfile.ZipFile(os.path.join(TgtPath, outFilename), "w")
     zipToFile(bookFile, TmpPath, TmpPath)
 
+    if os.path.exists(TmpPath):
+        rmtree(TmpPath)
+
 def walkAndGenBaseData(SrcPath):
     # 1.遍历目录，收集所有信息
     SrcData = []
@@ -269,8 +272,14 @@ print(SrcPath)
 SrcPath = input("请输入(或拖入)路径:")
 
 if not os.path.exists(SrcPath):
-    print("路径错误！")
+    print("路径错误！请保证路径中没有空格")
+    pause = input("按任意键关闭")
     sys.exit()
+
+TgtPath = os.path.join(SrcPath, "..", "BookOutput")
+TmpPath = os.path.join(TgtPath, "Temp")
+TextFolder = os.path.join(TmpPath, "OEBPS", "text")
+ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
 BOOK_TITLE = os.path.basename(SrcPath)
 SrcData = walkAndGenBaseData(SrcPath)
