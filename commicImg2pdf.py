@@ -163,10 +163,9 @@ def genBook(srcData, bookTitle, outFilename):
             img0 = Image.open(fullPath)
             w, h = img0.size
 
-            # pageW = 842 * w / h
-            # pageH = 842
-            pageW = 1684 * w / h
-            pageH = 1684
+            # [595 842]的两倍大
+            pageW = 1190
+            pageH = 1190 * h / w
             # add an empty Page
             page = Page(
                 width=Decimal(pageW+10),
