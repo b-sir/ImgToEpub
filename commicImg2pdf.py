@@ -205,6 +205,7 @@ if not os.path.exists(SrcPath):
     pause = input("按任意键关闭")
     sys.exit()
 
+RemoveSrcPath = False
 #如果输入的是zip文件，解压缩
 if os.path.isfile(SrcPath):
     baseName = os.path.basename(SrcPath)
@@ -213,6 +214,7 @@ if os.path.isfile(SrcPath):
         bName = baseName[0:len(baseName)-4]
         Util.unzipToDir(SrcPath, baseFolder, bName)
         SrcPath = os.path.join(baseFolder, bName)
+        RemoveSrcPath = True
     else:
         print("路径错误！不支持的文件")
         pause = input("按任意键关闭")
@@ -246,5 +248,6 @@ else:
     genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".pdf")
 
 Util.saferemove(TmpPath)
-
+if RemoveSrcPath:
+    Util.saferemove(SrcPath)
 
