@@ -185,10 +185,16 @@ def genBook(srcData, bookTitle, outFilename):
     with open(Path(os.path.join(TgtPath, outFilename)), "wb") as pdf_file_handle:
         PDF.dumps(pdf_file_handle, pdf)
 
-
-print("请输入图片所在最上层目录 路径，如：")
-print(SrcPath)
-SrcPath = input("请输入(或拖入)路径:")
+if len(sys.argv) == 2:
+    SrcPath = sys.argv[1]
+elif(len(sys.argv) <= 1):
+    print("请输入图片所在最上层目录 路径，如：")
+    print(SrcPath)
+    SrcPath = input("请输入(或拖入)路径:")
+else:
+    print("参数错误！")
+    pause = input("按任意键关闭")
+    sys.exit()
 
 if SrcPath.startswith("\"") and SrcPath.endswith("\""):
     SrcPath = SrcPath[1:len(SrcPath)-1]
@@ -207,7 +213,8 @@ SrcData = walkAndGenBaseData(SrcPath)
 
 PrintSrcData(SrcData)
 print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
-pause = input("确认正确后，输入任意内容继续：")
+if(len(sys.argv) <= 1):
+    pause = input("确认正确后，输入任意内容继续：")
 
 if (len(SrcData) > MAX_CHAPTER):
     total = len(SrcData)
