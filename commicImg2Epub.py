@@ -215,7 +215,7 @@ def genBook(srcData, bookTitle, outFilename):
 
 
     # 生成opf文件内容
-    coverFormatDesc = "image/png" if pFormat == ".png" else "image/jpeg"
+    coverFormatDesc = "image/png" if coverFormat == ".png" else "image/jpeg"
     itemsStr = '<item id="cover" href="image/%s" media-type="%s" properties="cover-image"></item>\n'%(coverFileName, coverFormatDesc)
     itemsStr += '<item id="p_cover" href="text/p_cover.xhtml" media-type="application/xhtml+xml" properties="svg" fallback="cover"></item>\n'
     itemRefStr = ""
@@ -293,8 +293,12 @@ if os.path.isfile(SrcPath):
         bName = baseName[0:len(baseName)-4]
         Util.unzipToDir(SrcPath, baseFolder, bName)
         SrcPath = os.path.join(baseFolder, bName)
+    else:
+        print("路径错误！不支持的文件")
+        pause = input("按任意键关闭")
+        sys.exit()
 
-TgtPath = os.path.join(SrcPath, "..", "BookOutput")
+TgtPath = os.path.join(SrcPath, "..")
 TmpPath = os.path.join(TgtPath, "Temp")
 TextFolder = os.path.join(TmpPath, "OEBPS", "text")
 ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
@@ -321,3 +325,5 @@ if (len(SrcData) > MAX_CHAPTER):
         ed = min(st + MAX_CHAPTER, total)
 else:
     genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub")
+
+Util.saferemove(TmpPath)

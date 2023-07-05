@@ -213,8 +213,12 @@ if os.path.isfile(SrcPath):
         bName = baseName[0:len(baseName)-4]
         Util.unzipToDir(SrcPath, baseFolder, bName)
         SrcPath = os.path.join(baseFolder, bName)
+    else:
+        print("路径错误！不支持的文件")
+        pause = input("按任意键关闭")
+        sys.exit()
 
-TgtPath = os.path.join(SrcPath, "..", "BookOutput")
+TgtPath = os.path.join(SrcPath, "..")
 TmpPath = os.path.join(TgtPath, "Temp")
 ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
@@ -241,5 +245,6 @@ if (len(SrcData) > MAX_CHAPTER):
 else:
     genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".pdf")
 
+Util.saferemove(TmpPath)
 
 
