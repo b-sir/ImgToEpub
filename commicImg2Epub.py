@@ -269,6 +269,9 @@ print("请输入图片所在最上层目录 路径，如：")
 print(SrcPath)
 SrcPath = input("请输入(或拖入)路径:")
 
+if SrcPath.startswith("\"") and SrcPath.endswith("\""):
+    SrcPath = SrcPath[1:len(SrcPath)-1]
+
 if not os.path.exists(SrcPath):
     print("路径错误！请保证路径中没有空格")
     pause = input("按任意键关闭")

@@ -13,8 +13,8 @@ from decimal import Decimal
 
 from PIL import Image
 
-#需要 pip3 install borb
-#需要 pip3 install Pillow
+#需要 pip3 install borb -i https://pypi.tuna.tsinghua.edu.cn/simple
+#需要 pip3 install Pillow -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 #################-----Config-----###############
 JPEG_QUILTY = 90      #图片压缩质量 1~100
@@ -189,6 +189,9 @@ def genBook(srcData, bookTitle, outFilename):
 print("请输入图片所在最上层目录 路径，如：")
 print(SrcPath)
 SrcPath = input("请输入(或拖入)路径:")
+
+if SrcPath.startswith("\"") and SrcPath.endswith("\""):
+    SrcPath = SrcPath[1:len(SrcPath)-1]
 
 if not os.path.exists(SrcPath):
     print("路径错误！请保证路径中没有空格")
