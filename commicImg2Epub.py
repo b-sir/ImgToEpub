@@ -59,6 +59,7 @@ def walk(folder, rootData, chaperData):
             newChapter["newImagefiles"] = []
             rootData.append(newChapter)
             walk(tmp_path, rootData, newChapter["files"])
+    chaperData.sort()
 
 def walkAndGenBaseData(SrcPath):
     # 1.遍历目录，收集所有信息
