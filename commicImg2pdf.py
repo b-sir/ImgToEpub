@@ -170,8 +170,8 @@ def genBook(srcData, bookTitle, outFilename):
             pageH = 1190 * h / w
             # add an empty Page
             page = Page(
-                width=Decimal(pageW+10),
-                height=Decimal(pageH+10),
+                width=Decimal(pageW+16),
+                height=Decimal(pageH+16),
             )
             pdf.add_page(page)
 
