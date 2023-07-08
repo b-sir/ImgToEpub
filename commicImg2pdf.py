@@ -202,7 +202,8 @@ if SrcPath.startswith("\"") and SrcPath.endswith("\""):
     SrcPath = SrcPath[1:len(SrcPath)-1]
 
 if not os.path.exists(SrcPath):
-    print("路径错误！请保证路径中没有空格")
+    print(SrcPath)
+    print("路径错误！请保证路径中没有特殊字符")
     pause = input("按任意键关闭")
     sys.exit()
 
