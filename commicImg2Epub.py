@@ -28,19 +28,6 @@ TmpPath = os.path.join(TgtPath, "Temp")
 TextFolder = os.path.join(TmpPath, "OEBPS", "text")
 ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
-
-def writeFile(path, str):
-    fp = open(path, 'w', encoding='UTF-8')
-    fp.write(str)
-    fp.close()
-
-def readFile(path):
-    fp = open(path, 'r', encoding='UTF-8')
-    str = fp.read()
-    fp.close()
-    return str
-
-
 def walk(folder, rootData, chaperData):
     fs = os.listdir(folder)
     for fl in fs:
@@ -87,12 +74,12 @@ def PrintSrcData(srcData):
         for fileName in iData["files"]:
             print(fileName)
 
-textTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "text", "p_temp.xhtml"))
+textTempStr = Util.readFile(os.path.join(CurrentDir, "libs", "OEBPS", "text", "p_temp.xhtml"))
 def genOEBPSTextFile(chapterID, subID, imageName, bookTitle, data):
     newTextStr = textTempStr.replace("###BOOK_TITLE###", bookTitle, 1)
     newTextStr = newTextStr.replace("###IMAGE_FILE###", imageName, 1)
     fileName = "p%03d_%05d"%(chapterID,subID)
-    writeFile(os.path.join(TextFolder, fileName+".xhtml"), newTextStr)
+    Util.writeFile(os.path.join(TextFolder, fileName+".xhtml"), newTextStr)
 
     data["newTextfiles"].append(fileName)
     data["newImagefiles"].append(imageName)
@@ -244,20 +231,20 @@ def genBook(srcData, bookTitle, outFilename):
             itemRefStr = itemRefStr + '<itemref linear="yes" idref="%s" properties="%s"></itemref>\n'%(textItem, properties)
             isInLeft = not isInLeft
 
-    opfTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "standard.opf"))
+    opfTempStr = Util.readFile(os.path.join(CurrentDir, "libs", "OEBPS", "standard.opf"))
     newOpfStr = opfTempStr.replace("###BOOK_TITLE###", bookTitle)
     newOpfStr = newOpfStr.replace("###BOOK_ID###", str(uuid.uuid1()))
     newOpfStr = newOpfStr.replace("###BOOK_ITEMS###", itemsStr)
     newOpfStr = newOpfStr.replace("###BOOK_ITEMREFS###", itemRefStr)
 
-    writeFile(os.path.join(TmpPath, "OEBPS", "standard.opf"), newOpfStr)
+    Util.writeFile(os.path.join(TmpPath, "OEBPS", "standard.opf"), newOpfStr)
 
 
     # 生成 navigation-documents.xhtml 内容
 
-    docTempStr = readFile(os.path.join(CurrentDir, "libs", "OEBPS", "navigation-documents.xhtml"))
+    docTempStr = Util.readFile(os.path.join(CurrentDir, "libs", "OEBPS", "navigation-documents.xhtml"))
     newDocStr = docTempStr.replace("###BOOK_DICT###", dictStr)
-    writeFile(os.path.join(TmpPath, "OEBPS", "navigation-documents.xhtml"), newDocStr)
+    Util.writeFile(os.path.join(TmpPath, "OEBPS", "navigation-documents.xhtml"), newDocStr)
 
 
     print("\n压制中... => "+outFilename)
