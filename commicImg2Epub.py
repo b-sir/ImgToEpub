@@ -12,7 +12,7 @@ import zipfile
 #需要 pip3 install Pillow
 
 #################-----Config-----###############
-JPEG_QUILTY = 90      #图片压缩质量 1~100
+JPEG_QUILTY = 70      #图片压缩质量 1~100
 MAX_CHAPTER = 5       #文件夹数量超过这个 会生成多个epub文件
 SpliteImage = True    #切割宽比高大的图片为两张图片
 ReadModeRight = True  #设置切割图片的阅读顺序 True为日漫右向左读(决定切割图片后左右哪个先)
