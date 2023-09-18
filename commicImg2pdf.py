@@ -22,6 +22,7 @@ JPEG_QUILTY = 90      #图片压缩质量 1~100
 MAX_CHAPTER = 5       #文件夹数量超过这个 会生成多个epub文件
 SpliteImage = True    #切割宽比高大的图片为两张图片
 ReadModeRight = True  #设置切割图片的阅读顺序 True为日漫右向左读(决定切割图片后左右哪个先)
+ForceToGray = False    #转黑白图片
 #################-----Config-----###############
 
 BOOK_TITLE = "书名"   #
@@ -130,6 +131,9 @@ def genBook(srcData, bookTitle, outFilename):
                         box2 = (w-w//2, 0, w, h)
                     newImg1 = img0.crop(box1).convert("RGB")
                     newImg2 = img0.crop(box2).convert("RGB")
+                    if ForceToGray:
+                        newImg1 = newImg1.convert("1")
+                        newImg2 = newImg2.convert("1")
 
                     name1 = "i%03d_%05d.jpg"%(chapterID,subID)
                     newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
@@ -141,6 +145,12 @@ def genBook(srcData, bookTitle, outFilename):
                     subID = subID + 1
 
                     subLens = subLens + 1
+                elif ForceToGray:
+                    name1 = "i%03d_%05d.jpg"%(chapterID,subID)
+                    newImg1 = img0.convert("1")
+                    newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
+                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
+                    subID = subID + 1
                 else:
                     pFormat = file[-4:]
                     name = "i%03d_%05d%s"%(chapterID,subID,pFormat)
