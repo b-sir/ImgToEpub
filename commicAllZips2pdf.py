@@ -13,8 +13,8 @@ def walk(folder):
         if not os.path.isdir(tmp_path):
             pFormat = fl[-4:]
             if pFormat == ".zip":
-                print("py ./commicImg2pdf.py \"" + tmp_path + "\"")
-                os.system("py ./commicImg2pdf.py \"" + tmp_path + "\"")
+                print("python ./commicImg2pdf.py \"" + tmp_path + "\"")
+                os.system("python ./commicImg2pdf.py \"" + tmp_path + "\"")
 
 
 
