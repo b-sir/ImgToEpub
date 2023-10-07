@@ -201,7 +201,11 @@ def genBook(srcData, bookTitle, outFilename):
                 print("\n\n文件异常 无法处理 跳过："+file+"\n\n")
 
     #封面图片处理
-    coverSrcFile = os.path.join(ImgFolder, srcData[0]["newImagefiles"][0])
+    coverSrcFile = ""
+    for i in range(len(srcData)):
+        if len(srcData[i]["newImagefiles"]) > 0:
+            coverSrcFile = os.path.join(ImgFolder, srcData[i]["newImagefiles"][0])
+            break
     coverFormat = coverSrcFile[-4:]
     coverFileName = "cover"+coverFormat 
     copyfile(coverSrcFile, os.path.join(ImgFolder, coverFileName))
