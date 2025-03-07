@@ -7,6 +7,7 @@ from pathlib import Path
 from borb.pdf import Document
 from borb.pdf import Page
 from borb.pdf import SingleColumnLayout
+from borb.pdf import MultiColumnLayout
 from borb.pdf import Paragraph
 from borb.pdf import PDF
 from borb.pdf import Image as PdfImage
@@ -188,16 +189,27 @@ def genBook(srcData, bookTitle, outFilename):
             pageH = 1190 * h / w
             # add an empty Page
             page = Page(
-                width=Decimal(pageW+16),
-                height=Decimal(pageH+16),
+                width=Decimal(pageW),
+                height=Decimal(pageH),
             )
             pdf.add_page(page)
 
-            layout = SingleColumnLayout(page, Decimal(0), Decimal(0))
+            #layout = SingleColumnLayout(page) #SingleColumnLayout(page, Decimal(0), Decimal(0))
+            layout = MultiColumnLayout(
+                page = page, 
+                column_widths=[pageW * Decimal(0.999)],
+                footer_paint_method=None,
+                header_paint_method=None,
+                inter_column_margins=[],
+                margin_bottom=Decimal(pageH) * Decimal(0.01),
+                margin_left=Decimal(pageW) * Decimal(0.01),
+                margin_right=Decimal(pageW) * Decimal(0.01),
+                margin_top=Decimal(pageH) * Decimal(0.01),
+            )
             img: PdfImage = PdfImage(
                 Path(fullPath),
-                width=Decimal(pageW),
-                height=Decimal(pageH),
+                width=Decimal(pageW*0.98),
+                height=Decimal(pageH*0.98),
             )
             layout.add(img)
 
