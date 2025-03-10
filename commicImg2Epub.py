@@ -276,69 +276,71 @@ def genBook(srcData, bookTitle, outFilename):
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
 
-if len(sys.argv) == 2:
-    SrcPath = sys.argv[1]
-elif(len(sys.argv) <= 1):
-    print("请输入图片所在最上层目录 路径，如：")
-    print(SrcPath)
-    SrcPath = input("请输入(或拖入)路径:")
-else:
-    print("参数错误！")
-    pause = input("按任意键关闭")
-    sys.exit()
 
-if SrcPath.startswith("\"") and SrcPath.endswith("\""):
-    SrcPath = SrcPath[1:len(SrcPath)-1]
-
-if not os.path.exists(SrcPath):
-    print(SrcPath)
-    print("路径错误！请保证路径中没有特殊字符")
-    pause = input("按任意键关闭")
-    sys.exit()
-
-RemoveSrcPath = False
-#如果输入的是zip文件，解压缩
-if os.path.isfile(SrcPath):
-    baseName = os.path.basename(SrcPath)
-    baseFolder = SrcPath[0:len(SrcPath)-len(baseName)-1]
-    if baseName.endswith(".zip"):
-        bName = baseName[0:len(baseName)-4]
-        Util.unzipToDir(SrcPath, baseFolder, bName)
-        SrcPath = os.path.join(baseFolder, bName)
-        RemoveSrcPath = True
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        SrcPath = sys.argv[1]
+    elif(len(sys.argv) <= 1):
+        print("请输入图片所在最上层目录 路径，如：")
+        print(SrcPath)
+        SrcPath = input("请输入(或拖入)路径:")
     else:
-        print("路径错误！不支持的文件")
+        print("参数错误！")
         pause = input("按任意键关闭")
         sys.exit()
 
-TgtPath = os.path.join(SrcPath, "..")
-TmpPath = os.path.join(TgtPath, "Temp")
-TextFolder = os.path.join(TmpPath, "OEBPS", "text")
-ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
+    if SrcPath.startswith("\"") and SrcPath.endswith("\""):
+        SrcPath = SrcPath[1:len(SrcPath)-1]
 
-BOOK_TITLE = os.path.basename(SrcPath)
-SrcData = walkAndGenBaseData(SrcPath)
+    if not os.path.exists(SrcPath):
+        print(SrcPath)
+        print("路径错误！请保证路径中没有特殊字符")
+        pause = input("按任意键关闭")
+        sys.exit()
 
-PrintSrcData(SrcData)
-print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
-if(len(sys.argv) <= 1):
-    pause = input("确认正确后，输入任意内容继续：")
+    RemoveSrcPath = False
+    #如果输入的是zip文件，解压缩
+    if os.path.isfile(SrcPath):
+        baseName = os.path.basename(SrcPath)
+        baseFolder = SrcPath[0:len(SrcPath)-len(baseName)-1]
+        if baseName.endswith(".zip"):
+            bName = baseName[0:len(baseName)-4]
+            Util.unzipToDir(SrcPath, baseFolder, bName)
+            SrcPath = os.path.join(baseFolder, bName)
+            RemoveSrcPath = True
+        else:
+            print("路径错误！不支持的文件")
+            pause = input("按任意键关闭")
+            sys.exit()
 
-if (len(SrcData) > MAX_CHAPTER):
-    total = len(SrcData)
-    st = 0
-    ed = 5
+    TgtPath = os.path.join(SrcPath, "..")
+    TmpPath = os.path.join(TgtPath, "Temp")
+    TextFolder = os.path.join(TmpPath, "OEBPS", "text")
+    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
-    while st < total:
-        subData = SrcData[st:ed]
-        title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
-        genBook(subData, title, title+".epub")
+    BOOK_TITLE = os.path.basename(SrcPath)
+    SrcData = walkAndGenBaseData(SrcPath)
 
-        st = ed
-        ed = min(st + MAX_CHAPTER, total)
-else:
-    genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub")
+    PrintSrcData(SrcData)
+    print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
+    if(len(sys.argv) <= 1):
+        pause = input("确认正确后，输入任意内容继续：")
 
-Util.saferemove(TmpPath)
-if RemoveSrcPath:
-    Util.saferemove(SrcPath)
+    if (len(SrcData) > MAX_CHAPTER):
+        total = len(SrcData)
+        st = 0
+        ed = 5
+
+        while st < total:
+            subData = SrcData[st:ed]
+            title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
+            genBook(subData, title, title+".epub")
+
+            st = ed
+            ed = min(st + MAX_CHAPTER, total)
+    else:
+        genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub")
+
+    Util.saferemove(TmpPath)
+    if RemoveSrcPath:
+        Util.saferemove(SrcPath)
