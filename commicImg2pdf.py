@@ -82,7 +82,7 @@ def PrintSrcData(srcData):
         for fileName in iData["files"]:
             print(fileName)
 
-def reGenTempFolder():
+def reGenTempFolder(TgtPath, TmpPath, ImgFolder):
     if not os.path.exists(TgtPath):
         os.mkdir(TgtPath)
 
@@ -101,14 +101,14 @@ def reGenTempFolder():
 def genOEBPSTextFile(chapterID, subID, imageName, bookTitle, data):
     data["newImagefiles"].append(imageName)
 
-def genBook(srcData, bookTitle, outFilename):
+def genBook(srcData, bookTitle, outFilename, TgtPath, TmpPath, ImgFolder):
     if os.path.exists(os.path.join(TgtPath, outFilename)):
         print("跳过：已存在电子书 "+outFilename)
         return
 
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
-    reGenTempFolder()
+    reGenTempFolder(TgtPath, TmpPath, ImgFolder)
 
     print("开始生成电子书："+bookTitle)
     chapterID = 0
@@ -217,6 +217,38 @@ def genBook(srcData, bookTitle, outFilename):
     with open(Path(os.path.join(TgtPath, outFilename)), "wb") as pdf_file_handle:
         PDF.dumps(pdf_file_handle, pdf)
 
+def GenFileFromSrcPath(_srcPath):
+    SrcPath = _srcPath
+    TgtPath = os.path.join(SrcPath, "..")
+    TmpPath = os.path.join(TgtPath, "Temp")
+    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
+
+    BOOK_TITLE = os.path.basename(SrcPath)
+    SrcData = walkAndGenBaseData(SrcPath)
+
+    PrintSrcData(SrcData)
+    print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
+    if(len(sys.argv) <= 1 and __name__ == "__main__"):
+        pause = input("确认正确后，输入任意内容继续：")
+
+    if (len(SrcData) > MAX_CHAPTER):
+        total = len(SrcData)
+        st = 0
+        ed = 5
+
+        while st < total:
+            subData = SrcData[st:ed]
+            title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
+            genBook(subData, title, title+".pdf", TgtPath, TmpPath, ImgFolder)
+
+            st = ed
+            ed = min(st + MAX_CHAPTER, total)
+    else:
+        genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".pdf", TgtPath, TmpPath, ImgFolder)
+
+    Util.saferemove(TmpPath)
+    if RemoveSrcPath:
+        Util.saferemove(SrcPath)
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -254,34 +286,5 @@ if __name__ == "__main__":
             pause = input("按任意键关闭")
             sys.exit()
 
-    TgtPath = os.path.join(SrcPath, "..")
-    TmpPath = os.path.join(TgtPath, "Temp")
-    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
-
-    BOOK_TITLE = os.path.basename(SrcPath)
-    SrcData = walkAndGenBaseData(SrcPath)
-
-    PrintSrcData(SrcData)
-    print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
-    if(len(sys.argv) <= 1):
-        pause = input("确认正确后，输入任意内容继续：")
-
-    if (len(SrcData) > MAX_CHAPTER):
-        total = len(SrcData)
-        st = 0
-        ed = 5
-
-        while st < total:
-            subData = SrcData[st:ed]
-            title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
-            genBook(subData, title, title+".pdf")
-
-            st = ed
-            ed = min(st + MAX_CHAPTER, total)
-    else:
-        genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".pdf")
-
-    Util.saferemove(TmpPath)
-    if RemoveSrcPath:
-        Util.saferemove(SrcPath)
+    GenFileFromSrcPath(SrcPath)
 

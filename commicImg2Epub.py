@@ -77,7 +77,7 @@ def PrintSrcData(srcData):
             print(fileName)
 
 textTempStr = Util.readFile(os.path.join(CurrentDir, "libs", "OEBPS", "text", "p_temp.xhtml"))
-def genOEBPSTextFile(chapterID, subID, imageName, bookTitle, data):
+def genOEBPSTextFile(chapterID, subID, imageName, bookTitle, data, TextFolder):
     newTextStr = textTempStr.replace("###BOOK_TITLE###", bookTitle, 1)
     newTextStr = newTextStr.replace("###IMAGE_FILE###", imageName, 1)
     fileName = "p%03d_%05d"%(chapterID,subID)
@@ -101,7 +101,7 @@ def zipToFile(zipFile, folder, root):
          if os.path.isdir(tmp_path):
             zipToFile(zipFile, tmp_path, root)
 
-def reGenTempFolder():
+def reGenTempFolder(TgtPath, TmpPath, ImgFolder, TextFolder):
     if not os.path.exists(TgtPath):
         os.mkdir(TgtPath)
 
@@ -130,14 +130,14 @@ def reGenTempFolder():
         os.mkdir(TextFolder)
 
 
-def genBook(srcData, bookTitle, outFilename):
+def genBook(srcData, bookTitle, outFilename, TgtPath, TmpPath, ImgFolder, TextFolder):
     if os.path.exists(os.path.join(TgtPath, outFilename)):
         print("跳过：已存在电子书 "+outFilename)
         return
 
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
-    reGenTempFolder()
+    reGenTempFolder(TgtPath, TmpPath, ImgFolder, TextFolder)
 
     print("开始生成电子书："+bookTitle)
     chapterID = 0
@@ -168,11 +168,11 @@ def genBook(srcData, bookTitle, outFilename):
 
                     name1 = "i%03d_%05d.jpg"%(chapterID,subID)
                     newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
-                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
+                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data,TextFolder)
                     subID = subID + 1
                     name2 = "i%03d_%05d.jpg"%(chapterID,subID)
                     newImg2.save(os.path.join(ImgFolder, name2 ), "jpeg", quality=90)
-                    genOEBPSTextFile(chapterID,subID,name2,bookTitle,data)
+                    genOEBPSTextFile(chapterID,subID,name2,bookTitle,data,TextFolder)
                     subID = subID + 1
 
                     subLens = subLens + 1
@@ -180,7 +180,7 @@ def genBook(srcData, bookTitle, outFilename):
                     name1 = "i%03d_%05d.jpg"%(chapterID,subID)
                     newImg1 = img0.convert("L")
                     newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
-                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
+                    genOEBPSTextFile(chapterID,subID,name1,bookTitle,data,TextFolder)
                     subID = subID + 1
                 else:
                     pFormat = file[-4:]
@@ -188,12 +188,12 @@ def genBook(srcData, bookTitle, outFilename):
                         name1 = "i%03d_%05d.jpg"%(chapterID,subID)
                         newImg1 = img0.convert("RGB")
                         newImg1.save(os.path.join(ImgFolder, name1), "jpeg", quality=JPEG_QUILTY)
-                        genOEBPSTextFile(chapterID,subID,name1,bookTitle,data)
+                        genOEBPSTextFile(chapterID,subID,name1,bookTitle,data,TextFolder)
                         subID = subID + 1
                     else:
                         name = "i%03d_%05d%s"%(chapterID,subID,pFormat)
                         copyfile(file, os.path.join(ImgFolder, name))
-                        genOEBPSTextFile(chapterID,subID,name,bookTitle,data)
+                        genOEBPSTextFile(chapterID,subID,name,bookTitle,data,TextFolder)
                         subID = subID + 1
             except KeyboardInterrupt: #手动Ctrl+C退出
                 sys.exit()
@@ -276,6 +276,39 @@ def genBook(srcData, bookTitle, outFilename):
     if os.path.exists(TmpPath):
         rmtree(TmpPath)
 
+def GenFileFromSrcPath(_srcPath):
+    SrcPath = _srcPath
+    TgtPath = os.path.join(SrcPath, "..")
+    TmpPath = os.path.join(TgtPath, "Temp")
+    TextFolder = os.path.join(TmpPath, "OEBPS", "text")
+    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
+
+    BOOK_TITLE = os.path.basename(SrcPath)
+    SrcData = walkAndGenBaseData(SrcPath)
+
+    PrintSrcData(SrcData)
+    print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
+    if(len(sys.argv) <= 1 and __name__ == "__main__"):
+        pause = input("确认正确后，输入任意内容继续：")
+
+    if (len(SrcData) > MAX_CHAPTER):
+        total = len(SrcData)
+        st = 0
+        ed = 5
+
+        while st < total:
+            subData = SrcData[st:ed]
+            title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
+            genBook(subData, title, title+".epub", TgtPath, TmpPath, ImgFolder, TextFolder)
+
+            st = ed
+            ed = min(st + MAX_CHAPTER, total)
+    else:
+        genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub", TgtPath, TmpPath, ImgFolder, TextFolder)
+
+    Util.saferemove(TmpPath)
+    if RemoveSrcPath:
+        Util.saferemove(SrcPath)
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -313,34 +346,5 @@ if __name__ == "__main__":
             pause = input("按任意键关闭")
             sys.exit()
 
-    TgtPath = os.path.join(SrcPath, "..")
-    TmpPath = os.path.join(TgtPath, "Temp")
-    TextFolder = os.path.join(TmpPath, "OEBPS", "text")
-    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
+    GenFileFromSrcPath(SrcPath)
 
-    BOOK_TITLE = os.path.basename(SrcPath)
-    SrcData = walkAndGenBaseData(SrcPath)
-
-    PrintSrcData(SrcData)
-    print("\n请浏览和确认以上信息，主要确认文件排序是否正确")
-    if(len(sys.argv) <= 1):
-        pause = input("确认正确后，输入任意内容继续：")
-
-    if (len(SrcData) > MAX_CHAPTER):
-        total = len(SrcData)
-        st = 0
-        ed = 5
-
-        while st < total:
-            subData = SrcData[st:ed]
-            title = "%s%d-%d"%(BOOK_TITLE, (st+1), ed)
-            genBook(subData, title, title+".epub")
-
-            st = ed
-            ed = min(st + MAX_CHAPTER, total)
-    else:
-        genBook(SrcData, BOOK_TITLE, BOOK_TITLE+".epub")
-
-    Util.saferemove(TmpPath)
-    if RemoveSrcPath:
-        Util.saferemove(SrcPath)
