@@ -283,6 +283,21 @@ def GenFileFromSrcPath(_srcPath):
     TextFolder = os.path.join(TmpPath, "OEBPS", "text")
     ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
+    RemoveSrcPath = False
+    #如果输入的是zip文件，解压缩
+    if os.path.isfile(SrcPath):
+        baseName = os.path.basename(SrcPath)
+        baseFolder = SrcPath[0:len(SrcPath)-len(baseName)-1]
+        if baseName.endswith(".zip"):
+            bName = baseName[0:len(baseName)-4]
+            Util.unzipToDir(SrcPath, baseFolder, bName)
+            SrcPath = os.path.join(baseFolder, bName)
+            RemoveSrcPath = True
+        else:
+            print("路径错误！不支持的文件")
+            pause = input("按任意键关闭")
+            sys.exit()
+
     BOOK_TITLE = os.path.basename(SrcPath)
     SrcData = walkAndGenBaseData(SrcPath)
 
@@ -330,21 +345,6 @@ if __name__ == "__main__":
         print("路径错误！请保证路径中没有特殊字符")
         pause = input("按任意键关闭")
         sys.exit()
-
-    RemoveSrcPath = False
-    #如果输入的是zip文件，解压缩
-    if os.path.isfile(SrcPath):
-        baseName = os.path.basename(SrcPath)
-        baseFolder = SrcPath[0:len(SrcPath)-len(baseName)-1]
-        if baseName.endswith(".zip"):
-            bName = baseName[0:len(baseName)-4]
-            Util.unzipToDir(SrcPath, baseFolder, bName)
-            SrcPath = os.path.join(baseFolder, bName)
-            RemoveSrcPath = True
-        else:
-            print("路径错误！不支持的文件")
-            pause = input("按任意键关闭")
-            sys.exit()
 
     GenFileFromSrcPath(SrcPath)
 
