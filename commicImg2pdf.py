@@ -197,7 +197,7 @@ def genBook(srcData, bookTitle, outFilename):
             #layout = SingleColumnLayout(page) #SingleColumnLayout(page, Decimal(0), Decimal(0))
             layout = MultiColumnLayout(
                 page = page, 
-                column_widths=[pageW * Decimal(0.999)],
+                column_widths=[pageW * Decimal(0.98)],
                 footer_paint_method=None,
                 header_paint_method=None,
                 inter_column_margins=[],
@@ -208,8 +208,8 @@ def genBook(srcData, bookTitle, outFilename):
             )
             img: PdfImage = PdfImage(
                 Path(fullPath),
-                width=Decimal(pageW*0.98),
-                height=Decimal(pageH*0.98),
+                width=Decimal(pageW*0.97),
+                height=Decimal(pageH*0.97),
             )
             layout.add(img)
 
