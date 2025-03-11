@@ -219,9 +219,6 @@ def genBook(srcData, bookTitle, outFilename, TgtPath, TmpPath, ImgFolder):
 
 def GenFileFromSrcPath(_srcPath):
     SrcPath = _srcPath
-    TgtPath = os.path.join(SrcPath, "..")
-    TmpPath = os.path.join(TgtPath, "Temp")
-    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
     RemoveSrcPath = False
     #如果输入的是zip文件，解压缩
@@ -237,6 +234,10 @@ def GenFileFromSrcPath(_srcPath):
             print("路径错误！不支持的文件")
             pause = input("按任意键关闭")
             sys.exit()
+    
+    TgtPath = os.path.join(SrcPath, "..")
+    TmpPath = os.path.join(TgtPath, "Temp")
+    ImgFolder = os.path.join(TmpPath, "OEBPS", "image")
 
     BOOK_TITLE = os.path.basename(SrcPath)
     SrcData = walkAndGenBaseData(SrcPath)
